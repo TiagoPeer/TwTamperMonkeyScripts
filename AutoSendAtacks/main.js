@@ -10,9 +10,13 @@
 (function () {
     "use strict";
 
-    const refreshPageSecondsBeforeAtack = 5 * 1000;
-    const offset = 0;
+    let config = {
+        offset: 15,
+        refreshPageSecondsBeforeAtack: 5
+    }
+
     const storageData = localStorage.getItem("autosend_commands");
+    const configData = localStorage.getItem("autosend_config");
     let data = storageData != null ? JSON.parse(storageData) : null;
     const waitingAtack = data != null && data.command.commandDate > Date.now();
     let refreshTimeout;
@@ -22,6 +26,8 @@
     function init() {
         sanitazeStoredCommands();
         createUI();
+        createSettingUI();
+        readConfigStorageData();
         if (data != null && data.command != null) {
             addCommandsToUI(data.command.date);
             const serverTimeElement = document.querySelector("#serverTime");
@@ -51,7 +57,7 @@
                             serverSecond
                         );
 
-                        var timeRemaining = targetDate - serverDate.getTime();
+                        var timeRemaining = (targetDate - serverDate.getTime()) + parseInt(config.offset);
 
                         atackTimeout = setTimeout(atackButtonClick, timeRemaining);
                     }
@@ -68,12 +74,19 @@
                 $("#troop_confirm_train").click();
                 item.units.forEach((unit, index) => {
                     $(".unit-row").eq(i).find("input").eq(index).val(unit)
-                    console.log(`Unit at index ${index}: ${unit}`);
                 });
             });
-            // TODO: Add remaining rows
-            console.log(data.atacksRows)
         }
+    }
+
+    function readConfigStorageData(){
+        if(configData != null){
+            config = JSON.parse(configData);
+        }
+
+        localStorage.setItem("autosend_config", JSON.stringify(config));
+        $("#offset").val(config.offset);
+        $("#refresh_time").val(config.refreshPageSecondsBeforeAtack);
     }
 
     function sanitazeStoredCommands() {
@@ -123,6 +136,45 @@
         $("#place_confirm_units").before(html);
         initFields();
         registerHandlers();
+    }
+
+    function createSettingUI(){
+        let html = 
+        `
+        <tr>
+            <td>
+                <span>Offset(ms):</span>
+            </td>
+            <td colspan="2">
+                <input id="offset" type="number">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>Tempo refresh(segundos):</span>
+            </td>
+            <td colspan="2">
+                <input id="refresh_time" type="number">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <span class="btn" id="save_settings">Salvar</span>
+            </td>
+        </tr>
+        `;
+
+        $(".schedule_table tr:eq(1)").before(html);
+        $("#save_settings").on("click", updateSettings);
+    }
+
+    function updateSettings(){
+        let offset =  $("#offset").val();
+        let refreshPageSecondsBeforeAtack = $("#refresh_time").val();
+
+        config = {offset, refreshPageSecondsBeforeAtack};
+        localStorage.setItem("autosend_config", JSON.stringify(config));
+        UI.SuccessMessage("Configurações salvas!")
     }
 
     function addCommandsToUI(date) {
@@ -220,7 +272,7 @@
         let dataToStore = { command: { date: timeValue, commandDate: date }, atacksRows: atackRows };
         localStorage.setItem("autosend_commands", JSON.stringify(dataToStore));
 
-        let refreshTime = calculatedDate - refreshPageSecondsBeforeAtack;
+        let refreshTime = calculatedDate - (config.refreshPageSecondsBeforeAtack * 1000);
 
         refreshTimeout = setTimeout(function () {
             window.location.reload();
