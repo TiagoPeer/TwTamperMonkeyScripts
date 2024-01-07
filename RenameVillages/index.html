@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+<!-- <div id="editableDiv" contentEditable="true" style="margin:10px 0"></div>
+<button id="insertHTMLButton">Insert HTML</button>
+
+<script>
+  const editableDiv = document.getElementById("editableDiv");
+  const insertHTMLButton = document.getElementById("insertHTMLButton");
+
+  insertHTMLButton.addEventListener("click", function() {
+    editableDiv.focus();
+    const htmlToInsert = " <span>HTML</span>";
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+
+    console.log(range)
+
+    const fragment = range.createContextualFragment(htmlToInsert);
+    range.insertNode(fragment);
+  });
+</script> -->
+
+
+<div id="editableDiv" contenteditable="true" style="margin: 10px 0"> </div>
+<button id="insertHTMLButton">Insert HTML</button>
+
+<script>
+  const editableDiv = document.getElementById("editableDiv");
+  const insertHTMLButton = document.getElementById("insertHTMLButton");
+
+  insertHTMLButton.addEventListener("click", function() {
+    const newNode = document.createElement("span");
+    newNode.innerHTML = "HTML";
+
+    // Append the new <span> element to the existing content
+    editableDiv.appendChild(newNode);
+  });
+</script>
+
+<!-- <div id="editableDiv" contentEditable="true" style="margin: 10px 0"></div>
+<button id="insertHTMLButton">Insert HTML</button>
+
+<script>
+  const editableDiv = document.getElementById("editableDiv");
+  const insertHTMLButton = document.getElementById("insertHTMLButton");
+
+  insertHTMLButton.addEventListener("click", function() {
+    editableDiv.focus();
+    const htmlToInsert = " <span>HTML</span><span></span>";
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+
+    const newNode = document.createElement("span");
+    newNode.innerHTML = htmlToInsert;
+
+    if (range.collapsed) {
+      range.insertNode(newNode);
+    } else {
+      range.deleteContents();
+      range.insertNode(newNode);
+    }
+  });
+</script> -->
+
+
+
+
+
+
+
+</body>
+
+</html>
