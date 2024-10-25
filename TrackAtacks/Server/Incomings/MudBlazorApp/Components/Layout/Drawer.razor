@@ -1,0 +1,31 @@
+﻿@* <MudAppBar Elevation="0">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <MudSpacer />
+    @if (AppBarContent is not null)
+    {
+        @AppBarContent
+    }
+</MudAppBar> *@
+<MudAppBar Elevation="4" Color="Color.Primary">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <MudImage Src="images/phd_v2_logo.png" Width="100" Alt="Swedish Farm House" Elevation="0" Class="ma-4" />
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+</MudAppBar>
+<MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="5" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true" Class="mud-drawer-fixed">
+    <NavMenu />
+    <MudSpacer />
+</MudDrawer>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? AppBarContent { get; set; }
+
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

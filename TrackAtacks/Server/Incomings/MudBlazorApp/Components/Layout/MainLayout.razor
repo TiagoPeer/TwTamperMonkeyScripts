@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="MyTheme" />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="4" Color="Color.Primary">
+        @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+        <MudImage Src="images/phd_v2_logo.png" Width="100" Alt="Swedish Farm House" Elevation="0" Class="ma-4" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    @* <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="5" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+        <NavMenu />
+        <MudSpacer />
+        <MudText>Footer</MudText>
+    </MudDrawer> *@
+    <WrappedDrawer @rendermode="RenderMode.InteractiveServer" />
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+    MudTheme MyTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = "#DF0024",
+                Secondary = Colors.Green.Accent4,
+                AppbarBackground = Colors.Red.Default,
+            },
+        };
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

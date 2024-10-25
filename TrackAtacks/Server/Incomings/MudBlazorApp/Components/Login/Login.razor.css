@@ -1,0 +1,81 @@
+﻿button {
+    color: red;
+    background-color: orange;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form-container {
+    width: 20%;
+}
+
+    .login-form-container h3 {
+        font-size: 30px;
+        color: #403866;
+        line-height: 1.2;
+        text-transform: uppercase;
+        text-align: center;
+        width: 100%;
+        display: block;
+        padding-bottom: 40px;
+    }
+
+.form-floating {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+input.custom-input,
+::deep input.custom-input {
+    color: #403866;
+    line-height: 1.2;
+    font-size: 18px;
+    display: block;
+    width: 100%;
+    background: 0 0;
+    height: 62px;
+    padding: 0 20px 0 38px;
+}
+
+.wrap-input {
+    width: 100%;
+    position: relative;
+    background-color: #e6e6e6;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+button {
+    font-family: Ubuntu-Bold;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.2;
+    text-transform: uppercase;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 62px;
+    background-color: #827ffe;
+    border-radius: 3px;
+    -webkit-transition: all .4s;
+    -o-transition: all .4s;
+    -moz-transition: all .4s;
+    transition: all .4s;
+    margin: 20px 0px;
+}

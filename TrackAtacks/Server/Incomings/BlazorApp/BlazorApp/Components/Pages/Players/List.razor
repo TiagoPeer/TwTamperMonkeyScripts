@@ -1,0 +1,45 @@
+﻿@page "/players"
+@using Application.Interfaces.Services
+@using Core.Entities
+@attribute [StreamRendering]
+
+<PageTitle>Players</PageTitle>
+
+<h1>Players List</h1>
+
+@if (players == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>GameId</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var player in players)
+            {
+                <tr>
+                    <td>@player.GameId</td>
+                    <td>@player.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Player>? players;
+
+    [Inject]
+    private IPlayersService PlayersService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        players = await PlayersService.GetAllAsync();
+    }
+}

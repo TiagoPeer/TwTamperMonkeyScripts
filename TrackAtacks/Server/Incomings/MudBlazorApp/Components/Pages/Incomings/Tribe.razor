@@ -1,0 +1,123 @@
+﻿@page "/incomings/tribe/{tribeId:int}"
+@using Application.Interfaces.Services
+@using Core.DTOs.Incomings
+@using Core.Entities
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+
+@if (Incomings == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<CommandsViewDTO>>>(ServerReload))" Hover="false" SortLabel="Sort By" Elevation="0" Dense="@dense" @ref="table">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Comandos</MudText>
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<Command, object>(x=>x.LandTime)">Date</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CommandsViewDTO, object>(x=>x.originPlayer)">Jogador Origem</MudTableSortLabel></MudTh>
+            <MudTh>Aldeia Origem</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CommandsViewDTO, object>(x=>x.destinyPlayer)">Jogador Destino</MudTableSortLabel></MudTh>
+            <MudTh>Perigo Aldeia</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date">@context.landTime</MudTd>
+            <MudTd DataLabel="Temp. (C)">@context.originPlayer</MudTd>
+            <MudTd DataLabel="Temp. (F)">@context.originVillage</MudTd>
+            <MudTd DataLabel="Summary">@context.destinyPlayer</MudTd>
+            <MudTd DataLabel="Summary"><MudChip Color="Color.Primary">Default</MudChip></MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{1,50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public int TribeId { get; set; }
+
+    private List<CommandsViewDTO>? Incomings { get; set; }
+
+    [Inject]
+    private IIncomingsService IncomingsService { get; set; }
+    [Inject]
+    private IVillageService VillageService { get; set; }
+
+    //Table variables
+    private bool dense = false;
+
+    private string searchString = null;
+    private IEnumerable<CommandsViewDTO> pagedData;
+    private MudTable<CommandsViewDTO> table;
+
+    private int totalItems;
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: "#"),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Incomings = (await IncomingsService.GetTribeIncomingsAsync(TribeId)).Commands;
+        // foreach (var village in Incomings.Select(i => i.DestinyVillage))
+        // {
+        //     await VillageService.EvaluateVillageRisk(village.GameId);
+        // }
+        if(Incomings.Count > 15)
+        {
+            dense = true;
+        }
+
+        Snackbar.Add("Comandos Carregados", Severity.Success);
+    }
+
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<CommandsViewDTO>> ServerReload(TableState state)
+    {
+        var data = await IncomingsService.GetTribeIncomingsAsync(TribeId, state.Page, state.PageSize, searchString);
+        // switch (state.SortLabel)
+        // {
+        //     case "nr_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Number);
+        //         break;
+        //     case "sign_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Sign);
+        //         break;
+        //     case "name_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Name);
+        //         break;
+        //     case "position_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Position);
+        //         break;
+        //     case "mass_field":
+        //         data = data.OrderByDirection(state.SortDirection, o => o.Molar);
+        //         break;
+        // }
+
+        // pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<CommandsViewDTO>() { TotalItems = data.TotalItems, Items = data.Commands };
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+}

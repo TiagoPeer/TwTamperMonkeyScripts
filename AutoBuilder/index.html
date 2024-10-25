@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+
+    <title>Building Levels Selector</title>
+  </head>
+  <body>
+    <label for="buildingSelector">Select a building:</label>
+    <select id="buildingSelector"></select>
+
+    <button onclick="addToSelectedList()">Add to List</button>
+
+    <label for="selectedList">Selected Buildings:</label>
+    <ul id="selectedList"></ul>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+      const buildings = {
+        Main: { name: "Main", maxLevel: 30 },
+        Barracks: { name: "Barracks", maxLevel: 25 },
+        Stable: { name: "Stable", maxLevel: 20 },
+        Garage: { name: "Garage", maxLevel: 15 },
+        Watchtower: { name: "Watchtower", maxLevel: 15 },
+        Snob: { name: "Snob", maxLevel: 1 },
+        Smith: { name: "Smith", maxLevel: 20 },
+        Place: { name: "Place", maxLevel: 1 },
+        Statue: { name: "Statue", maxLevel: 1 },
+        Market: { name: "Market", maxLevel: 25 },
+        Wood: { name: "Wood", maxLevel: 30 },
+        Stone: { name: "Stone", maxLevel: 30 },
+        Iron: { name: "Iron", maxLevel: 30 },
+        Farm: { name: "Farm", maxLevel: 30 },
+        Storage: { name: "Storage", maxLevel: 30 },
+        Hide: { name: "Hide", maxLevel: 10 },
+        Wall: { name: "Wall", maxLevel: 20 },
+      };
+
+      const translations = {
+        Main: { en: "Main", pt: "Edifício Principal" },
+        Barracks: { en: "Barracks", pt: "Quartel" },
+        Stable: { en: "Stable", pt: "Estábulo" },
+        Garage: { en: "Garage", pt: "Oficina" },
+        Watchtower: { en: "Watchtower", pt: "Torre de Vigia" },
+        Smith: { en: "Smith", pt: "Ferreiro" },
+        Snob: { en: "Snob", pt: "Academia" },
+        Place: { en: "Place", pt: "Praça de Reuniões" },
+        Statue: { en: "Statue", pt: "Estátua" },
+        Market: { en: "Market", pt: "Mercado" },
+        Wood: { en: "Wood", pt: "Bosque" },
+        Stone: { en: "Stone", pt: "Poço de Argila" },
+        Iron: { en: "Iron", pt: "Mina de Ferro" },
+        Farm: { en: "Farm", pt: "Fazenda" },
+        Storage: { en: "Storage", pt: "Armazém" },
+        Hide: { en: "Hide", pt: "Esconderijo" },
+        Wall: { en: "Wall", pt: "Muralha" },
+      };
+
+      function getBuildingName(buildingKey, language) {
+        console.log(buildingKey);
+        return (
+          translations[buildingKey][language] || translations[buildingKey].en
+        );
+      }
+
+      const buildingSelector = document.getElementById("buildingSelector");
+      const selectedList = document.getElementById("selectedList");
+      let selectedBuildings = [];
+
+      const storedSelectedBuildings = localStorage.getItem("selectedBuildings");
+      if (storedSelectedBuildings) {
+        selectedBuildings = JSON.parse(storedSelectedBuildings);
+      }
+
+      // Populate the select list with options
+      function populateBuildingSelector(lastSelectedIndex) {
+        buildingSelector.innerHTML = "";
+
+        for (const building in buildings) {
+          const maxLevel = buildings[building].maxLevel;
+          const optionGroup = document.createElement("optgroup");
+          optionGroup.label = building;
+
+          const filteredArray = selectedBuildings.filter(
+            (obj) => obj.selectedBuilding === building
+          );
+
+          // Find the maximum level for the selectedBuilding
+          const maxLevelSelected =
+            filteredArray.length > 0
+              ? filteredArray.reduce(
+                  (max, obj) => Math.max(max, parseInt(obj.selectedLevel, 10)),
+                  -Infinity
+                )
+              : 0;
+
+          if (maxLevelSelected + 1 <= maxLevel) {
+            const option = document.createElement("option");
+            option.value = maxLevelSelected + 1;
+            option.text = `Level ${maxLevelSelected + 1}`;
+            optionGroup.appendChild(option);
+          }
+
+          buildingSelector.appendChild(optionGroup);
+        }
+
+        buildingSelector.selectedIndex = lastSelectedIndex;
+      }
+
+      function addToSelectedList() {
+        const selectedOption =
+          buildingSelector.options[buildingSelector.selectedIndex];
+        const selectedBuilding = selectedOption.parentNode.label;
+        const selectedLevel = buildingSelector.value;
+
+        const selectedItem = { selectedBuilding, selectedLevel };
+
+        if (!selectedBuildings[selectedBuilding]) {
+          selectedBuildings[selectedBuilding] = selectedLevel;
+        } else {
+          selectedBuildings[selectedBuilding] = Math.max(
+            selectedBuildings[selectedBuilding],
+            selectedLevel
+          );
+        }
+
+        const objectExists = selectedBuildings.some(
+          (obj) =>
+            obj.selectedBuilding === selectedItem.selectedBuilding &&
+            obj.selectedLevel === selectedItem.selectedLevel
+        );
+        if (!objectExists) selectedBuildings.push(selectedItem);
+
+        localStorage.setItem(
+          "selectedBuildings",
+          JSON.stringify(selectedBuildings)
+        );
+
+        lastSelectedIndex = selectedOption.index;
+        populateBuildingSelector(lastSelectedIndex);
+        renderSelectedList();
+      }
+
+      function renderSelectedList() {
+        while (selectedList.firstChild) {
+          selectedList.removeChild(selectedList.firstChild);
+        }
+        let id = 1;
+        selectedBuildings.forEach((elem) => {
+          const listItem = document.createElement("li");
+          listItem.setAttribute("data-building", elem.selectedBuilding);
+          listItem.setAttribute("data-level", elem.selectedLevel);
+          listItem.setAttribute("id", `list-item-${id}`);
+          id++;
+          listItem.textContent = `${elem.selectedBuilding} - Level ${elem.selectedLevel}`;
+
+          const filteredArray = selectedBuildings.filter(
+            (obj) => obj.selectedBuilding === elem.selectedBuilding
+          );
+
+          const maxLevelSelected =
+            filteredArray.length > 0
+              ? filteredArray.reduce(
+                  (max, obj) => Math.max(max, parseInt(obj.selectedLevel, 10)),
+                  -Infinity
+                )
+              : 0;
+
+          if (elem.selectedLevel == maxLevelSelected) {
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "Remove";
+            removeButton.onclick = function () {
+              removeFromSelectedList(elem);
+            };
+
+            listItem.appendChild(removeButton);
+          }
+
+          selectedList.appendChild(listItem);
+        });
+      }
+
+      function removeFromSelectedList(building) {
+        const newArray = selectedBuildings.filter((item) => item !== building);
+        selectedBuildings = newArray;
+        localStorage.setItem(
+          "selectedBuildings",
+          JSON.stringify(selectedBuildings)
+        );
+
+        populateBuildingSelector();
+        renderSelectedList();
+      }
+
+      populateBuildingSelector();
+      renderSelectedList();
+
+      //   $(function () {
+      //     $("#selectedList").sortable({
+      //       beforeStop: function (event, ui) {
+      //         const currentItemId = ui.item.attr("id");
+      //         const currentBuilding = ui.item.attr("data-building");
+      //         const currentLevel = parseInt(ui.item.attr("data-level"));
+      //         // console.log(currentItemId);
+      //         // console.log(currentBuilding);
+      //         // console.log(currentLevel);
+      //         // Get the previous item in the list
+      //         const previousItems = ui.item.prevAll();
+      //         const resultArray = [];
+      //         previousItems.each(function () {
+      //           const building = $(this).data("building");
+      //           const level = $(this).data("level");
+      //           resultArray.push({ building, level });
+      //         });
+      //         const containsElement = resultArray.some(
+      //           (item) =>
+      //             item.building === currentBuilding &&
+      //             item.level === currentLevel - 1
+      //         );
+      //         if (!containsElement) {
+      //           console.log("cancel");
+      //           // Cancel the drop operation if the current level is not greater than the previous level
+      //           ui.sender.sortable("cancel");
+      //         }
+      //       },
+      //       //   update: function (event, ui) {
+      //       //     // Get the updated order
+      //       //     const newOrder = $(this).sortable("toArray");
+      //       //     const updatedData = newOrder.map((itemId) => ({
+      //       //       selectedBuilding: $(`#${itemId}`).data("building"),
+      //       //       selectedLevel: $(`#${itemId}`).data("level"),
+      //       //     }));
+      //       //     // Save the new order (you can send it to the server or store it locally)
+      //       //     console.log("New Order:", updatedData);
+      //       //     // For example, you can send the new order to the server using an AJAX request
+      //       //     // For demonstration purposes, let's store it in local storage
+      //       //     // localStorage.setItem("sortableListOrder", JSON.stringify(newOrder));
+      //       //     localStorage.setItem(
+      //       //       "selectedBuildings",
+      //       //       JSON.stringify(updatedData)
+      //       //     );
+      //       //   },
+      //     });
+      //     $("#selectedList").disableSelection();
+      //   });
+    </script>
+  </body>
+</html>

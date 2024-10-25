@@ -1,0 +1,4 @@
+﻿dotnet ef --startup-project ../WebAPI/ migrations add AddGameIdToCommands
+dotnet ef --startup-project ../WebAPI/ database update
+
+dotnet ef --startup-project ../WebAPI/ migrations remove

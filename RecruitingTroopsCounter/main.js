@@ -6,6 +6,9 @@
 // @match        https://*/*screen=barracks*
 // @match        https://*/*screen=garage*
 // @match        https://*/*screen=stable*
+// @require      https://code.jquery.com/jquery-3.7.1.min.js
+// @downloadURL  https://raw.githubusercontent.com/TiagoPeer/TwTamperMonkeyScripts/main/RecruitingTroopsCounter/main.js
+// @updateURL    https://github.com/TiagoPeer/TwTamperMonkeyScripts/blob/main/RecruitingTroopsCounter/main.js
 // @icon         https://dspt.innogamescdn.com/asset/5b5eb006/graphic/big_buildings/barracks3.png
 // ==/UserScript==
 

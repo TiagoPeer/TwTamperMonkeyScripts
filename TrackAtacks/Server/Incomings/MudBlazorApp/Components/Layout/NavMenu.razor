@@ -1,0 +1,9 @@
+﻿<MudNavMenu Bordered="true">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+    <MudNavLink Href="Counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Countertops">Counter</MudNavLink>
+    <MudNavGroup Title="Settings" Expanded="true" Icon="@Icons.Material.Filled.Store">
+        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Store">Users</MudNavLink>
+        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Store">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Store">About</MudNavLink>
+</MudNavMenu>

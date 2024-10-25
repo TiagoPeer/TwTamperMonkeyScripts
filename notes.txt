@@ -1,0 +1,9 @@
+obter data do servidor
+
+var date = Timing.getCurrentServerTime()/1e3+window.server_utc_diff
+
+obter relatorio
+
+TribalWars.get("report", { ajax: "view", id: 188810041 }, function (o) {
+  console.log(o);
+});

@@ -1,0 +1,59 @@
+﻿@* @page "/incomings/tribe/{tribeId:int}"
+@using Core.DTOs.Incomings
+
+<h3>Tribe</h3>
+
+@if (Incomings == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Jogador Origem</th>
+                <th>Aldeia Origem</th>
+                <th>Jogador Destino</th>
+                <th>Aldeia Destino</th>
+                <th>Tempo de chegada</th>
+                <th>Risco</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var incoming in Incomings)
+            {
+                <tr>
+                    <td>@incoming.OriginVillage.Owner.Name</td>
+                    <td>@incoming.OriginVillage.Coordinates.X|@incoming.OriginVillage.Coordinates.Y</td>
+                    <td>@incoming.DestinyVillage.Owner.Name</td>
+                    <td>@incoming.DestinyVillage.Coordinates.X|@incoming.DestinyVillage.Coordinates.Y</td>
+                    <td>@incoming.LandTime</td>
+                    <td><span class="badge badge-@(incoming.DestinyVillage.Risk == Risk.High ? "danger" : incoming.DestinyVillage.Risk == Risk.Moderated ? "warning" : "success")">Risco</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int TribeId { get; set; }
+
+    private List<CommandsViewDTO>? Incomings { get; set; }
+
+    [Inject]
+    private IIncomingsService IncomingsService { get; set; }
+    [Inject]
+    private IVillageService VillageService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Incomings = await IncomingsService.GetTribeIncomingsAsync(TribeId);
+        foreach (var village in Incomings.Select(i => i.DestinyVillage))
+        {
+            await VillageService.EvaluateVillageRisk(village.GameId);
+        }
+    }
+}
+ *@

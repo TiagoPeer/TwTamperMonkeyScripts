@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+
+<div>Ola</div>
+
+@code {
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (hubConnection == null)
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl(navigationManager.ToAbsoluteUri("/notificationshub")).Build();
+        }
+        if (hubConnection.State == HubConnectionState.Disconnected)
+        {
+            await hubConnection.StartAsync();
+        }
+
+        hubConnection.On<string>("SendMessage", (message) =>
+        {
+            Console.WriteLine(message);
+        });
+    }
+}
